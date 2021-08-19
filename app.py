@@ -286,4 +286,4 @@ def stage_details(stage_group_id, stage_name):
 
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=8000)
+    app.run(host='0.0.0.0', port=8000, debug=True)
