@@ -1,4 +1,5 @@
 from constraints.constraint_main.constraint import Constraint
+from constraints.constraint_main.custom_constraint import CustomConstraint
 from flask import Flask, request
 import jsonpickle
 from stage.stage import Stage, StageGroup
@@ -28,7 +29,7 @@ def index():
 def get_all_constraints():
     constraints = []
     for constraint in CreateConstraintUtil.all_constraints:
-        constraint_obj = CreateConstraintUtil.all_constraints[constraint]
+        constraint_obj: CustomConstraint = CreateConstraintUtil.all_constraints[constraint]
         number_of_inputs_required = constraint_obj.model.input_count
         is_constraint_required = number_of_inputs_required != 0
         constraints.append(
@@ -40,12 +41,18 @@ def get_all_constraints():
                 "configuration_input_amount": constraint_obj.model.configuration_input_count,
                 "configuration_params": constraint_obj.model.config_parameters,
                 "required": is_constraint_required,
-                "for_payment": constraint_obj.model.for_payment
-
+                "for_payment": constraint_obj.model.for_payment,
+                "completion_input_label": constraint_obj.completion_data_labels
             }
         )
 
     return {"constraints": constraints}
+
+
+@app.route("/constraint/<name>/data_labels")
+def get_constraint_completion_input_labels(name):
+    constraint_obj: CustomConstraint = CreateConstraintUtil.all_constraints[name]
+    return {"labels": constraint_obj.completion_data_labels}
 
 
 @app.route("/constraint_view/<constraint_name>", methods=["GET", "POST"])
